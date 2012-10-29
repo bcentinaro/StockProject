@@ -21,10 +21,10 @@ class StockModel
     @emaMemo = {}
     @csv = []
 
+    #Check the cache for csv / data  and emaMemo
     if @@cache.exist?("#{symbol.strip}-#{period}")
       model = @@cache.fetch("#{symbol.strip}-#{period}")
       if model[:endDate] == Date.today
-        @smaMemo = model[:smaMemo]
         @emaMemo = model[:emaMemo]
         @csv = model[:csv]
         @data = model[:data]
@@ -77,7 +77,7 @@ class StockModel
 
   #Simple Moving Average
   def sma(date, period)
-    period = period.to_i
+    period = period.to_i #need to make sure this is an int
 
     # Get the index value of the date provided
     index = @data[date][:index]
@@ -100,11 +100,13 @@ class StockModel
 
   #Exponential Moving Average
   def ema(date, period)
-    #Checking Memo Data
+    #Checking Memo Data - can save us a ton of processing time
+    # on recursion, so long as we do it in the right order.
     unless @emaMemo["#{date}-#{period}"].nil?
       return @emaMemo["#{date}-#{period}"]
     end
-    period = period.to_i
+    period = period.to_i #need to make sure this is an int
+
     #Getting the index value of the date provided
     index = @data[date][:index]
 

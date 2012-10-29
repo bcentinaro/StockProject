@@ -29,15 +29,17 @@ class MyApp < Sinatra::Application
 
   #Expects a _ seperated list of symbols
   get '/stock/:symbols/:period?.:format' do
+    # First things first, we need to setup variables
     @symbols = params[:symbols].gsub(/\s/, '').split('_')
     @period = params[:period]||5
     @urlBase = "/stock/#{params[:symbols].gsub(/\s/, '')}/#{@period}"
     stockController = StockController.new
-
     @values = stockController.index(@symbols.join(','), @period)  
     
+    
     @values.each do |key, value|
-      if File.exist? "./assets/#{key}.png"
+      # Check the existing graph files, delete them if they weren't rendered today
+      if File.exist? "./assets/#{key}-month.png"
         if Date.parse(File.ctime("./assets/#{key}-month.png").strftime('%F')) < Date.today
           File.delete "./assets/#{key}-month.png"
           File.delete "./assets/#{key}-90.png"
@@ -45,7 +47,8 @@ class MyApp < Sinatra::Application
         end
       end
 
-      unless File.exist? "./assets/#{key}.png"
+      #We only need to create new files, IF they don't already exist
+      unless File.exist? "./assets/#{key}-month.png"
 
         graph = Gruff::Line.new
         graph.title ="#{key} - 30 Days" 
@@ -70,6 +73,8 @@ class MyApp < Sinatra::Application
       end
     end
 
+    # We've got json data exposed, should we need it for something
+    # like javascript graphs (instead of image graphs)
     if params[:format] == 'json'
       return @values.to_json
     end
