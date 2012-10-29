@@ -1,0 +1,16 @@
+.row
+  .span12
+    -@values.each do |key, value|
+      %legend=key
+      %p
+        Open:
+        =value[:open]
+      %p 
+        Close:
+        =value[:close]
+      %p
+        EMA:
+        =value[:ema]
+      %p
+        SMA:
+        =value[:sma]

@@ -1,0 +1,35 @@
+.row
+  .span12#index
+    .pullRight
+
+      %a.btn.btn-primary{:href=>'/'}Back
+    -@values.each do |key, value|
+      %legend
+        Stock: 
+        =key
+        Graphs
+      %img{:src=>"/assets/#{key}-month.png"}  
+      %img{:src=>"/assets/#{key}-90.png"}
+      %img{:src=>"/assets/#{key}-entire.png"}  
+        
+    -@values.each do |key, value|
+      %legend
+        Stock: 
+        =key
+        Date
+      %table.stockData
+        %thead
+          %tr
+            %th Date
+            %th Close Value
+            %th SMA
+            %th EMA
+        %tbody
+          -value.data.each do |date, data|
+            %tr
+              %td
+                %a{:href=>"#{@urlBase}/#{date}"}=date
+              %td=data[:close]
+              %td=value.sma(date, 5)||0.0
+              -ema = value.ema(date, 5)||0.0
+              %td=ema.round(2)

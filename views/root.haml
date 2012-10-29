@@ -1,0 +1,15 @@
+.row
+  .span12
+    %form#searchForm.form-horizontal{:method=>'post'}
+      %input{:type=>'hidden', :name=>'_method', :value=>'get'}
+      .control-group
+        %label.control-label{:for=>"stock"}Stock Symbols
+        .controls
+          %input#stock{:type=>'text', :placeholder=>'goog, fb, aapl', :name=>'stock'}
+      .control-group
+        %label.control-label{:for=>'period'}Period
+        .controls
+          %input#period{:type=>'number', :value=>'5'}
+      .control-group
+        .controls
+          %button.btn.btn-primary Search

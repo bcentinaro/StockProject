@@ -5,13 +5,13 @@ class StockModelTest  < Test::Unit::TestCase
     #After sleeping on it, it's easier to let the modal handle how
     #it's initialized.
     def test_init
-      stock = StockModel.new('goog', 500, 5)
+      stock = StockModel.new('goog', 5)
       assert stock.endDate == Date.today , 'checking end date'
     end
 
     def test_persistance
       FileUtils.rm ['/tmp/goog.csv','/tmp/goog.json'], :force=>true 
-      stock = StockModel.new('goog', 500, 5)
+      stock = StockModel.new('goog', 5)
       stock.save('/tmp/goog', 'csv')
       stock.save('/tmp/goog', 'json')
 
@@ -22,7 +22,7 @@ class StockModelTest  < Test::Unit::TestCase
 
     #Test the Calculation for the SMA
     def test_calcSMA
-      stock = StockModel.new('goog', 500, 5)
+      stock = StockModel.new('goog', 5)
       sma = stock.sma("2012-10-25",1)
       assert sma == 677.76, "Checking 1 Day SMA. Value: #{sma}, Expected: 677.76"
       sma = stock.sma("2012-10-25",5)
@@ -35,20 +35,17 @@ class StockModelTest  < Test::Unit::TestCase
 
     #Test the calculation for the EMA
     def test_calcEMA
-      stock = StockModel.new('goog', 100, 5)
+      stock = StockModel.new('goog', 5)
       date = stock.csv[stock.csv.length - 6][0]
       current = stock.ema(date, 5)
       previous = current
       assert stock.sma(date, 5) == current, 'testing SMA (#{stock.sma(date, 5)}) = first EMA(#{current})'
-      10.times do |x|
-        date = stock.csv[stock.csv.length - (6 + x)][0]
-        previous = current
-        current = stock.ema(date,5)
-        multiplier = (2 / (5 + 1) )
-        expected = ((stock.data[date][:close] - previous) * multiplier + previous).round(2)
+      
 
-        assert current == expected, "Testing 5 Day EMA: #{current} Expected: #{expected}"
-      end
+      assert stock.ema('2004-08-27',5).round(5) == 106.91667, "Testing 5 Day EMA : #{stock.ema('2004-08-27',5)} Expected: #{106.91667}"
+      assert stock.ema('2004-08-30',5).round(5) == 105.28111, "Testing 5 Day EMA : #{stock.ema('2004-08-30',5)} Expected: #{105.28111}"
+      assert stock.ema('2004-08-31',5).round(5) == 104.31074, "Testing 5 Day EMA : #{stock.ema('2004-08-31',5)} Expected: #{104.31074}"
+      
     end
     
 end
